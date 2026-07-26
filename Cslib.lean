@@ -23,6 +23,9 @@ public import Cslib.Computability.Automata.NA.Loop
 public import Cslib.Computability.Automata.NA.Pair
 public import Cslib.Computability.Automata.NA.Prod
 public import Cslib.Computability.Automata.NA.Reverse
+public import Cslib.Computability.Automata.NA.SafraConstruction.SafraTree
+public import Cslib.Computability.Automata.NA.SafraConstruction.Test
+public import Cslib.Computability.Automata.NA.SafraConstruction.VTree
 public import Cslib.Computability.Automata.NA.Sum
 public import Cslib.Computability.Automata.NA.ToDA
 public import Cslib.Computability.Automata.NA.Total
