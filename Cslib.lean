@@ -24,6 +24,7 @@ public import Cslib.Computability.Automata.NA.Pair
 public import Cslib.Computability.Automata.NA.Preimage
 public import Cslib.Computability.Automata.NA.Prod
 public import Cslib.Computability.Automata.NA.Reverse
+public import Cslib.Computability.Automata.NA.SafraSchewe.SafraTree
 public import Cslib.Computability.Automata.NA.Sum
 public import Cslib.Computability.Automata.NA.ToDA
 public import Cslib.Computability.Automata.NA.Total
@@ -71,6 +72,7 @@ public import Cslib.Foundations.Control.Monad.Free.Effects
 public import Cslib.Foundations.Control.Monad.Free.Fold
 public import Cslib.Foundations.Data.BiTape
 public import Cslib.Foundations.Data.DecidableEqZero
+public import Cslib.Foundations.Data.Descriptive.Tree
 public import Cslib.Foundations.Data.FinFun.Basic
 public import Cslib.Foundations.Data.FinFun.Update
 public import Cslib.Foundations.Data.HasFresh
