@@ -18,7 +18,8 @@ initial state.
 
 Automata with different accepting conditions are then defined as extensions of `DA`.
 These include, for example, a generalised version of DFA as found in the literature (without
-finiteness assumptions), deterministic Buchi automata, and deterministic Muller automata.
+finiteness assumptions), deterministic Buchi automata, deterministic Muller automata, and
+deterministic Rabin automata.
 
 ## References
 
@@ -117,6 +118,24 @@ instance : ωAcceptor (Muller State Symbol) Symbol where
     (a.run xs).infOcc ∈ a.accept
 
 end Muller
+
+/-- Deterministic Rabin automaton. -/
+structure Rabin (State Symbol : Type*) extends DA State Symbol where
+  /-- The set of sets of accepting states. -/
+  pairs : Set (Set State × Set State)
+
+namespace Rabin
+
+/-- An infinite run is accepting iff the set of states that occur infinitely many times
+is one of the sets in `accept`. -/
+@[simp, scoped grind =]
+instance : ωAcceptor (Rabin State Symbol) Symbol where
+  Accepts (a : Rabin State Symbol) (xs : ωSequence Symbol) :=
+    ∃ p ∈ a.pairs, let ⟨acc, rej⟩ := p
+      (∃ᶠ k in atTop, a.run xs k ∈ acc) ∧
+      (∀ᶠ k in atTop, a.run xs k ∉ rej)
+
+end Rabin
 
 end DA
 
