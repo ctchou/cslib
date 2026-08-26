@@ -11,7 +11,6 @@ public import Mathlib.Computability.Language
 
 /-!
 # Language homomorphism
-
 -/
 
 @[expose] public section
@@ -20,12 +19,15 @@ namespace Language
 
 variable {α β : Type*}
 
+/-- A language homomorphism from `α` to `β` is a map from `List α` to `List β` which
+preserves the empty word `[]` and concatenation `(· ++ ·)`. -/
 @[ext]
 structure Hom (α β : Type*) where
   toFun : List α → List β
   map_nil' : toFun [] = []
   map_append' (as as' : List α) : toFun (as ++ as') = toFun as ++ toFun as'
 
+/-- This is to support the function application notation for language homomorphisms. -/
 instance : FunLike (Hom α β) (List α) (List β) where
   coe (f : Hom α β) := f.toFun
   coe_injective (_ _ : Hom α β) := by
@@ -56,6 +58,8 @@ theorem map_cons (f : Hom α β) (a : α) (as : List α) :
     f (a :: as) = f [a] ++ f as := by
   rw [← List.singleton_append, map_append]
 
+/-- This auxiliary function should not be used outside this file.
+Instead, use the equivalence `lift` below. -/
 def liftAux (f : α → List β) : Hom α β where
   toFun := List.flatMap f
   map_nil' := List.flatMap_nil
@@ -78,12 +82,15 @@ theorem listAux_right_inv (f : Hom α β) :
     rw [map_cons f, ← h_ind]
     simp [liftAux_eq_flatMap]
 
+/-- An equivalence from `f : α → List β` to `Hom α β`, whose forward direction can be
+used to define language homomorphisms conveniently. -/
 def lift : (α → List β) ≃ (Hom α β) where
   toFun := liftAux
   invFun := fun f a ↦ f [a]
   left_inv := listAux_left_inv
   right_inv := listAux_right_inv
 
+/-- `lift.toFun` is in fact `List.flatMap`. -/
 theorem lift_eq_flatMap (f : α → List β) : lift f = List.flatMap f :=
   rfl
 
@@ -91,9 +98,11 @@ end Hom
 
 section ImagePreimage
 
+/-- The image of a language under a function `f`, which need not be a language homomorphism. -/
 def image (f : List α → List β) (l : Language α) : Language β :=
   f '' l
 
+/-- The preimage of a language under a function `f`, which need not be a language homomorphism. -/
 def preimage (f : List α → List β) (l : Language β) : Language α :=
   f ⁻¹' l
 
