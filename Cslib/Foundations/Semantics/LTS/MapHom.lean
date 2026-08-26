@@ -11,20 +11,24 @@ public import Cslib.Foundations.Semantics.LTS.Basic
 
 
 /-!
-# Label map operation for LTS.
+# Label homomorphism map for LTS.
 -/
 
 @[expose] public section
 
 namespace Cslib.LTS
 
-variable {State Label₁ Label₂ : Type*}
-
 open Language
 open scoped Hom
 
+variable {State Label₁ Label₂ : Type*}
+
 section MapHom
 
+/-- Given a language homomorphism `f` from `Label₂` to `Label₁` and an LTS `lts` that
+uses `Label₁`, `lts.mapHom f` is an LTS with the same state space but uses `Label₂`, whose
+step on a single label `μ` is the composition of the steps taken by `lts` on the sequence of
+labels `f [μ]`.  Note that `f [μ]` can be empty or consists of many labels. -/
 def mapHom (lts : LTS State Label₁) (f : Hom Label₂ Label₁) : LTS State Label₂ where
   Tr s μ s' := lts.MTr s (f [μ]) s'
 
@@ -36,6 +40,8 @@ theorem mapHom_tr {lts : LTS State Label₁} {μ : Label₂} :
 
 scoped grind_pattern mapHom_tr => (lts.mapHom f).Tr s μ s'
 
+/-- This theorem says basically that `lts.mapHom f` is well-defined because `f` is
+a language homomorphism. -/
 @[simp, scoped grind =]
 theorem mapHom_mTr {lts : LTS State Label₁} {μs : List Label₂} :
     (lts.mapHom f).MTr s μs s' ↔ lts.MTr s (f μs) s' := by
@@ -53,7 +59,8 @@ end MapHom
 
 section MapLabel
 
-/-- Constructs an LTS by mapping its labels into those of an existing LTS. -/
+/-- This is the special case of `LTS.mapHom` when the language homomorphism maps
+single labels to single labels. -/
 def mapLabel (lts : LTS State Label₁) (f : Label₂ → Label₁) : LTS State Label₂ :=
   lts.mapHom (Hom.lift ([f ·]))
 
