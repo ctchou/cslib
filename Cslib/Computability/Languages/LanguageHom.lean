@@ -23,6 +23,7 @@ variable {α β : Type*}
 preserves the empty word `[]` and concatenation `(· ++ ·)`. -/
 @[ext]
 structure Hom (α β : Type*) where
+  /-- The map of a language homomorphism. -/
   toFun : List α → List β
   map_nil' : toFun [] = []
   map_append' (as as' : List α) : toFun (as ++ as') = toFun as ++ toFun as'

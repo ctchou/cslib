@@ -38,8 +38,6 @@ variable {s s' : State} {f : Hom Label₂ Label₁}
 theorem mapHom_tr {lts : LTS State Label₁} {μ : Label₂} :
     (lts.mapHom f).Tr s μ s' ↔ lts.MTr s (f [μ]) s' := by rfl
 
-scoped grind_pattern mapHom_tr => (lts.mapHom f).Tr s μ s'
-
 /-- This theorem says basically that `lts.mapHom f` is well-defined because `f` is
 a language homomorphism. -/
 @[simp, scoped grind =]
@@ -51,9 +49,9 @@ theorem mapHom_mTr {lts : LTS State Label₁} {μs : List Label₂} :
     rw [Hom.map_cons]
     apply Iff.intro .. <;> intro h
     · obtain ⟨_, _, _⟩ := MTr.cons_iff.mp h
-      grind [MTr.append_iff (lts := lts)]
+      grind [mapHom_tr, MTr.append_iff (lts := lts)]
     · obtain ⟨_, _, _⟩ := (MTr.append_iff (lts := lts)).mp h
-      grind [MTr.cons_iff (lts := lts.mapHom f)]
+      grind [mapHom_tr, MTr.cons_iff (lts := lts.mapHom f)]
 
 end MapHom
 
