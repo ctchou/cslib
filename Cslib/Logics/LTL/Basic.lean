@@ -22,12 +22,14 @@ open PFunctor
 
 inductive Operator where
   | next
+  | eventually
   | until
 
 def Signature : PFunctor where
   A := Operator
   B (op : Operator) := match op with
     | Operator.next => Fin 1
+    | Operator.eventually => Fin 1
     | Operator.until => Fin 2
 
 inductive Atom (S L : Type*) where
