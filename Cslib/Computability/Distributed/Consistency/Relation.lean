@@ -7,6 +7,7 @@ Authors: Ching-Tsun Chou
 module
 
 public import Cslib.Foundations.Relation.Defs
+public import Mathlib.Order.Basic
 
 /-! # More definitions and theorems about relation
 
@@ -34,5 +35,9 @@ def IsStrictTotalOrderOn (s : Set α) (r : α → α → Prop) : Prop :=
 
 def IsIntervalOrder (r : α → α → Prop) : Prop :=
   ∀ a1 b1 a2 b2, r a1 b1 ∧ r a2 b2 → r a1 b2 ∨ r a2 b1
+
+theorem acyclic_le {r s : α → α → Prop}
+    (hle : r ≤ s) (ha : Acyclic s) : Acyclic r := by
+  grind [irrefl_iff_le_ne, TransGen.mono hle]
 
 end Relation

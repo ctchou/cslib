@@ -123,4 +123,23 @@ theorem sequentialConsistency_imp_causalConsistency
   grind [SequentialConsistency, CausalConsistency, Causality, singleOrder_imp_eventualVisibility,
     singleOrder_readMyWrites_imp_causalArbitration, singleOrder_readMyWrites_imp_causalVisibility]
 
+lemma causality_imp_noCircularCausality
+    (h : a.Causality) : a.NoCircularCausality := by
+  intro s
+  have : a.hb s ≤ a.vis := by grind [Causality, CausalVisibility]
+  grind [a.vis_acyclic, acyclic_le]
+
+theorem causalConsistency_imp_basicEventualConsistency
+    (h : a.CausalConsistency d) : a.BasicEventualConsistency d := by
+  grind [CausalConsistency, BasicEventualConsistency, causality_imp_noCircularCausality]
+
+lemma eventualVisibility_rVal_imp_quiescentConsistency
+    (h1 : a.EventualVisibility) (h2 : a.RVal d) : a.QuiescentConsistency d := by
+  sorry
+
+theorem basicEventualConsistency_imp_quiescentConsistency
+    (h : a.BasicEventualConsistency d) : a.QuiescentConsistency d := by
+  grind [BasicEventualConsistency, QuiescentConsistency,
+    eventualVisibility_rVal_imp_quiescentConsistency]
+
 end Cslib.DistributedConsistency
