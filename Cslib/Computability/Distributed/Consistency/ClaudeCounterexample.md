@@ -1,8 +1,8 @@
-Question:
+# Question:
 
 I think that the last part of Proposition 5.1 on page 61 of the book, that BasicEventualConsistency implies QuiescentConsistency, is false.  I already know that its proof doesn't work, but that doesn't necessarily mean that the statement is false.  Can you come up with an explicit counterexample?
 
-Answer:
+# Answer:
 
 Yes, the statement is false. The proof breaks at the step "for each update event u, there exists a finite set E′ᵤ such that u is visible for all events in [f] \ E′ᵤ (by EventualVisibility)". EventualVisibility only constrains events that u *returns before*. An update that is rb-before nothing has no visibility obligations at all, and the definition of a well-formed history does not rule that out.
 
