@@ -8,6 +8,8 @@ module
 
 public import Cslib.Computability.Automata.NA.SafraConstruction.DeepLeftOrder
 public import Cslib.Computability.Automata.NA.SafraConstruction.Tree
+public import Cslib.Foundations.Semantics.FLTS.Basic
+public import Cslib.Foundations.Semantics.LTS.SetImage
 
 /-! # Safra Tree
 
@@ -15,7 +17,9 @@ public import Cslib.Computability.Automata.NA.SafraConstruction.Tree
 
 @[expose] public section
 
-namespace Cslib
+namespace Cslib.SafraConstruction
+
+variable {State Symbol : Type*}
 
 open Descriptive
 
@@ -26,17 +30,18 @@ structure MacroState (State : Type*) where
 
 namespace MacroState
 
-variable {State : Type*}
-
-def HasTree (ms : MacroState State) (t : tree ℕ) : Prop :=
+def IsTree (ms : MacroState State) (t : tree ℕ) : Prop :=
   Set.range ms.branch = t.val
 
 def AccAtLeaf (ms : MacroState State) (t : tree ℕ) : Prop :=
   ∀ x ∈ ms.accept, Tree.IsLeaf t x
 
 def WellFormed (ms : MacroState State) : Prop :=
-  ∃ t : tree ℕ, Tree.Ordered t ∧ ms.HasTree t ∧ ms.AccAtLeaf t
+  ∃ t : tree ℕ, Tree.Ordered t ∧ ms.IsTree t ∧ ms.AccAtLeaf t
 
 end MacroState
 
-end Cslib
+def macroTransConsistency (lts : LTS State Symbol) (flts : FLTS (MacroState State) Symbol) : Prop :=
+  ∀ ms a, (flts.tr ms a).states = lts.setImage ms.states a
+
+end Cslib.SafraConstruction
