@@ -141,4 +141,32 @@ theorem deepLeft_finset_min (s : Finset (List ℕ)) (hne : s.Nonempty) :
         simpa using ⟨deepLeft_refl x, fun y hy => deepLeft_trans h (hmin y hy)⟩
       · exact ⟨m, by simp [hm], by simpa using ⟨h, hmin⟩⟩
 
+/-- Truncation is monotone with respect to the lexicographic order. -/
+theorem take_le_take_of_lt {a b : List ℕ} (h : a < b) (l : ℕ) : a.take l ≤ b.take l := by
+  induction l generalizing a b with
+  | zero => simp
+  | succ l ih =>
+    cases h with
+    | nil => exact le_of_lt (List.Lex.nil)
+    | rel h => exact le_of_lt (List.Lex.rel h)
+    | cons h =>
+      simp only [List.take_succ_cons]
+      rcases (ih h).lt_or_eq with h' | h'
+      · exact le_of_lt (List.Lex.cons h')
+      · rw [h']
+
+/-- An extension of `x` agrees with `x` on the first `l ≤ x.length` entries. -/
+theorem take_eq_of_prefix {x y : List ℕ} {l : ℕ} (hp : x <+: y) (hl : l ≤ x.length) :
+    y.take l = x.take l := by
+  obtain ⟨t, rfl⟩ := hp
+  exact List.take_append_of_le_length hl
+
+/-- A `DeepLeft` move does not increase the length-`l` prefix lexicographically,
+provided the original list has length at least `l`. -/
+theorem take_le_take_of_deepLeft {x x' : List ℕ} {l : ℕ} (hl : l ≤ x.length)
+    (h : DeepLeft x' x) : x'.take l ≤ x.take l := by
+  rcases h with hp | ⟨hlt, -⟩
+  · exact (take_eq_of_prefix hp hl).le
+  · exact take_le_take_of_lt hlt l
+
 end Cslib

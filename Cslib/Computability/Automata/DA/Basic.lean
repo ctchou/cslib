@@ -70,6 +70,11 @@ theorem mtr_extract_eq_run {da : DA State Symbol} {xs : ωSequence Symbol} {n : 
   case zero => rfl
   case succ n h_ind => grind
 
+theorem mtr_run_extract_eq_run {da : DA State Symbol} {xs : ωSequence Symbol} {m n : ℕ}
+    (h : m ≤ n) : da.mtr (da.run xs m) (xs.extract m n) = da.run xs n := by
+  rw [← mtr_extract_eq_run, ← FLTS.mtr_append_eq,
+    append_extract_extract (Nat.zero_le m) h, mtr_extract_eq_run]
+
 /-- A deterministic automaton that accepts finite strings (lists of symbols). -/
 structure FinAcc (State Symbol : Type*) extends DA State Symbol where
   /-- The set of accepting states. -/
