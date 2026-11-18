@@ -19,6 +19,9 @@ namespace Cslib
 
 open Descriptive
 
+abbrev Tree.IsLeaf (T : tree α) (x : List α) : Prop :=
+  Tree.kidsAt T x = ∅
+
 structure SafraTree (α : Type*) where
   skel : tree ℕ
   set : skel → Set α
@@ -176,7 +179,7 @@ theorem trim_ensures (t : SafraTree α) (h : t.SetPairDisj) :
         exact ha
       · have haz : a ∈ t.subtreeUnion z := mem_subtreeUnion.mpr ⟨⟨y, hy⟩, hz, ha⟩
         have hcz : t.Collapsable z :=
-          ⟨hzs, hze, Set.nonempty_iff_ne_empty.mp ⟨a, haz⟩, hzr⟩
+          ⟨hzs, hze, Set.ne_empty_iff_nonempty.mpr ⟨a, haz⟩, hzr⟩
         refine ⟨⟨z, Or.inr hcz⟩, ?_⟩
         simp only [trim, hcz, ↓reduceIte]
         exact haz

@@ -35,8 +35,8 @@ abbrev Finite (T : tree α) : Prop :=
 def kidsAt (T : tree α) (x : List α) : Set α :=
   { a | x ++ [a] ∈ T }
 
-abbrev IsLeaf (T : tree α) (x : List α) : Prop :=
-  kidsAt T x = ∅
+def leaves (T : tree α) : Set (List α) :=
+  {x | x ∈ T ∧ kidsAt T x = ∅}
 
 def Ordered [LE α] (T : tree α) : Prop :=
   ∀ x : T, IsLowerSet (kidsAt T x)
