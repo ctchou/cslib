@@ -32,8 +32,8 @@ theorem backward_start (hs : SafraSpec na mda) (h : s ∈ (mda.mtr mda.start as)
 of `x` at the end has a predecessor in the label of `x` at the start. -/
 theorem backward_stable (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     (hst : ∀ bs, bs <+: as → x ∈ (mda.mtr ms bs).stableTree)
-    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraMap ⟨s, h⟩) :
-    ∃ s0, ∃ h0 : s0 ∈ ms.states, x <+: ms.safraMap ⟨s0, h0⟩ ∧
+    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraHost ⟨s, h⟩) :
+    ∃ s0, ∃ h0 : s0 ∈ ms.states, x <+: ms.safraHost ⟨s0, h0⟩ ∧
       ∃ ss, na.Execution s0 as s ss := by
   induction as using List.reverseRecOn generalizing s with
   | nil => exact ⟨s, h, hx, _, .refl s⟩
@@ -60,12 +60,12 @@ theorem backward_step (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     {bs : List Symbol} {a : Symbol}
     (hst : ∀ cs, cs <+: bs ++ [a] → x ∈ (mda.mtr ms cs).stableTree)
     (h : s ∈ (mda.mtr ms (bs ++ [a])).states)
-    (hx : x <+: (mda.mtr ms (bs ++ [a])).safraMap ⟨s, h⟩)
-    (hcond : x ≠ (mda.mtr ms (bs ++ [a])).safraMap ⟨s, h⟩ ∨
+    (hx : x <+: (mda.mtr ms (bs ++ [a])).safraHost ⟨s, h⟩)
+    (hcond : x ≠ (mda.mtr ms (bs ++ [a])).safraHost ⟨s, h⟩ ∨
       x ∈ (mda.mtr ms (bs ++ [a])).accept) :
     ∃ s1, ∃ h1 : s1 ∈ (mda.mtr ms bs).states, na.Tr s1 a s ∧
-      x <+: (mda.mtr ms bs).safraMap ⟨s1, h1⟩ ∧
-      (x ≠ (mda.mtr ms bs).safraMap ⟨s1, h1⟩ ∨ s ∈ na.accept) := by
+      x <+: (mda.mtr ms bs).safraHost ⟨s1, h1⟩ ∧
+      (x ≠ (mda.mtr ms bs).safraHost ⟨s1, h1⟩ ∨ s ∈ na.accept) := by
   have hsafra : x ∈ (mda.mtr ms bs).safraTree :=
     (macro_mtr_wellFormed hs ms bs hwf).stableTree_sub_safraTree
       (hst bs (List.prefix_append bs [a]))
@@ -95,9 +95,9 @@ theorem execution_extend_accept {s0 s1 s : State} {bs : List Symbol} {a : Symbol
 start by an execution that visits an accepting state of `na` after its first state. -/
 theorem backward_below (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     (hst : ∀ bs, bs <+: as → x ∈ (mda.mtr ms bs).stableTree) (hacc : x ∈ ms.accept)
-    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraMap ⟨s, h⟩)
-    (hne : x ≠ (mda.mtr ms as).safraMap ⟨s, h⟩) :
-    ∃ s0, ∃ h0 : s0 ∈ ms.states, ms.safraMap ⟨s0, h0⟩ = x ∧
+    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraHost ⟨s, h⟩)
+    (hne : x ≠ (mda.mtr ms as).safraHost ⟨s, h⟩) :
+    ∃ s0, ∃ h0 : s0 ∈ ms.states, ms.safraHost ⟨s0, h0⟩ = x ∧
       ∃ ss, na.Execution s0 as s ss ∧ ∃ t ∈ na.accept, t ∈ ss.tail := by
   induction as using List.reverseRecOn generalizing s with
   | nil => exact absurd (MacroState.leaf_prefix_eq_self ms h (hwf.accept_leaf hacc) hx).symm hne
@@ -117,9 +117,9 @@ stable throughout, then every state in the label of `x` at the end is reached fr
 at the start by an execution that visits an accepting state of `na` after its first state. -/
 theorem backward_accept (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     (hst : ∀ bs, bs <+: as → x ∈ (mda.mtr ms bs).stableTree) (hacc : x ∈ ms.accept)
-    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraMap ⟨s, h⟩)
+    (h : s ∈ (mda.mtr ms as).states) (hx : x <+: (mda.mtr ms as).safraHost ⟨s, h⟩)
     (hne : as ≠ []) (hacc' : x ∈ (mda.mtr ms as).accept) :
-    ∃ s0, ∃ h0 : s0 ∈ ms.states, ms.safraMap ⟨s0, h0⟩ = x ∧
+    ∃ s0, ∃ h0 : s0 ∈ ms.states, ms.safraHost ⟨s0, h0⟩ = x ∧
       ∃ ss, na.Execution s0 as s ss ∧ ∃ t ∈ na.accept, t ∈ ss.tail := by
   obtain ⟨bs, a, rfl⟩ : ∃ bs a, as = bs ++ [a] :=
     ⟨as.dropLast, as.getLast hne, (List.dropLast_append_getLast hne).symm⟩
