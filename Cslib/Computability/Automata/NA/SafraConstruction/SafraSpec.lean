@@ -26,18 +26,18 @@ open Descriptive Set Automata
 
 structure MacroState (State : Type*) where
   states : Set State
-  safraHost : states → List ℕ
+  host : states → List ℕ
   stableTree : tree ℕ
   accept : Set (List ℕ)
 
 namespace MacroState
 
 def safraTree (ms : MacroState State) : tree ℕ :=
-  treeOf (range ms.safraHost)
+  treeOf (range ms.host)
 
 theorem leaf_prefix_eq_self (ms : MacroState State) {x : List ℕ} {s : State} (h : s ∈ ms.states)
-    (hl : x ∈ Tree.leaves ms.safraTree) (hp : x <+: ms.safraHost ⟨s, h⟩) :
-    ms.safraHost ⟨s, h⟩ = x := by
+    (hl : x ∈ Tree.leaves ms.safraTree) (hp : x <+: ms.host ⟨s, h⟩) :
+    ms.host ⟨s, h⟩ = x := by
   obtain ⟨r, hr⟩ := hp
   cases r with
   | nil => simpa using hr.symm
@@ -51,7 +51,7 @@ structure WellFormed (ms : MacroState State) : Prop where
   safraTree_orderd : Tree.Ordered ms.safraTree
   stableTree_ordered : Tree.Ordered ms.stableTree
   stableTree_sub_safraTree : ms.stableTree ≤ ms.safraTree
-  safraHost_surjOn_safraTree : SurjOn ms.safraHost univ ms.safraTree.val
+  host_surjOn_safraTree : SurjOn ms.host univ ms.safraTree.val
   accept_leaf : ms.accept ⊆ Tree.leaves ms.safraTree
 
 end MacroState
@@ -65,17 +65,17 @@ structure SafraSpec (na : NA.Buchi State Symbol) (mda : DA.Rabin (MacroState Sta
   states_image : ∀ ms a, (mda.tr ms a).states = na.setImage ms.states a
   forward : ∀ ms a, let ms' := mda.tr ms a
     ∀ s s' (h : s ∈ ms.states) (h' : s' ∈ ms'.states), na.Tr s a s' →
-    let x := ms.safraHost ⟨s, h⟩
-    let x' := ms'.safraHost ⟨s', h'⟩
+    let x := ms.host ⟨s, h⟩
+    let x' := ms'.host ⟨s', h'⟩
     ( (DeepLeft x' x ∧ (s' ∈ na.accept → x' ≠ x)) ∨
       (x' <+: x ∧ x' ∈ ms'.accept) ) ∧
     (∀ y, y <+: x → y <+: x' → y ∈ ms'.stableTree)
   backward : ∀ ms a, let ms' := mda.tr ms a
     ∀ s' (h' : s' ∈ ms'.states),
-    ∀ x, x ∈ ms.safraTree → x ∈ ms'.stableTree → x <+: ms'.safraHost ⟨s', h'⟩ →
-      ∃ s, ∃ h : s ∈ ms.states, na.Tr s a s' ∧ x <+: ms.safraHost ⟨s, h⟩ ∧
-        ( (x ≠ ms'.safraHost ⟨s', h'⟩ ∨ x ∈ ms'.accept) →
-          (x ≠ ms.safraHost ⟨s, h⟩ ∨ s' ∈ na.accept) )
+    ∀ x, x ∈ ms.safraTree → x ∈ ms'.stableTree → x <+: ms'.host ⟨s', h'⟩ →
+      ∃ s, ∃ h : s ∈ ms.states, na.Tr s a s' ∧ x <+: ms.host ⟨s, h⟩ ∧
+        ( (x ≠ ms'.host ⟨s', h'⟩ ∨ x ∈ ms'.accept) →
+          (x ≠ ms.host ⟨s, h⟩ ∨ s' ∈ na.accept) )
   --
   pairs : mda.pairs =
     range fun x : List ℕ => ({ms | x ∈ ms.accept}, {ms | x ∉ ms.stableTree})

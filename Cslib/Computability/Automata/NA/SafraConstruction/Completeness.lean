@@ -24,6 +24,6 @@ variable {State Symbol : Type*}
 
 def freqHosts (as : ωSequence Symbol) (ss : ωSequence State) : Set (List ℕ) :=
   let mss : ωSequence (MacroState State) := mda.run as
-  {x | ∃ᶠ k in atTop, ∃ h : (ss k) ∈ (mss k).states, (mss k).safraHost ⟨ss k, h⟩ = x}
+  {x | ∃ᶠ k in atTop, ∃ h : (ss k) ∈ (mss k).states, (mss k).host ⟨ss k, h⟩ = x}
 
 end Cslib.SafraConstruction
