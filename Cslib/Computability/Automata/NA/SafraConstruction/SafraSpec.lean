@@ -11,6 +11,7 @@ public import Cslib.Computability.Automata.NA.Basic
 public import Cslib.Computability.Automata.NA.SafraConstruction.DeepLeftOrder
 public import Cslib.Computability.Automata.NA.SafraConstruction.Tree
 public import Cslib.Foundations.Semantics.LTS.SetImage
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-! # Safra Tree
 
@@ -35,6 +36,9 @@ namespace MacroState
 def safraTree (ms : MacroState State) : tree ℕ :=
   treeOf (range ms.host)
 
+theorem host_mem_safraTree (ms : MacroState State) (s : ms.states) : ms.host s ∈ ms.safraTree :=
+  ⟨ms.host s, ⟨s, rfl⟩, List.prefix_refl _⟩
+
 theorem leaf_prefix_eq_self (ms : MacroState State) {x : List ℕ} {s : State}
     (hs : s ∈ ms.states) (hl : x ∈ Tree.leaves ms.safraTree) (hp : x <+: ms.host ⟨s, hs⟩) :
     ms.host ⟨s, hs⟩ = x := by
@@ -54,6 +58,12 @@ structure WellFormed (ms : MacroState State) : Prop where
   host_surjOn_safraTree : SurjOn ms.host univ ms.safraTree.val
   accept_leaf : ms.accept ⊆ Tree.leaves ms.safraTree
 
+theorem safraTree_finite [Finite State] (ms : MacroState State) (hwf : ms.WellFormed) :
+    ms.safraTree.val.Finite :=
+  (finite_range ms.host).subset fun _ hy => by
+    obtain ⟨z, -, rfl⟩ := hwf.host_surjOn_safraTree hy
+    exact ⟨z, rfl⟩
+
 theorem safraTree_size_bound [Finite State] (ms : MacroState State) (hwf : ms.WellFormed) :
     ms.safraTree.val.ncard ≤ Nat.card State :=
   calc ms.safraTree.val.ncard
@@ -62,6 +72,43 @@ theorem safraTree_size_bound [Finite State] (ms : MacroState State) (hwf : ms.We
     _ ≤ (univ : Set ms.states).ncard := ncard_image_le (toFinite _)
     _ = Nat.card ms.states := ncard_univ _
     _ ≤ Nat.card State := Nat.card_mono (toFinite _) (subset_univ _) |>.trans_eq Nat.card_univ
+
+theorem length_le_of_nodup [Finite State] (ms : MacroState State) (hwf : ms.WellFormed)
+    {L : List (List ℕ)} (hL : L.Nodup) (hm : ∀ y ∈ L, y ∈ ms.safraTree) :
+    L.length ≤ Nat.card State :=
+  (List.Nodup.length_le_ncard hL (ms.safraTree_finite hwf) hm).trans (ms.safraTree_size_bound hwf)
+
+/-- Every node of the Safra tree is shorter than the number of states. -/
+theorem length_lt_of_mem_safraTree [Finite State] (ms : MacroState State) (hwf : ms.WellFormed)
+    {x : List ℕ} (hx : x ∈ ms.safraTree) : x.length < Nat.card State := by
+  have hL : ((List.range (x.length + 1)).map (x.take ·)).Nodup := by
+    refine List.Nodup.map_on (fun i hi j hj hij => ?_) List.nodup_range
+    have := congrArg List.length hij
+    simp only [List.mem_range] at hi hj
+    simp only [List.length_take] at this
+    lia
+  have := ms.length_le_of_nodup hwf hL (by
+    simp only [List.mem_map]
+    rintro _ ⟨i, -, rfl⟩
+    exact Tree.mem_of_prefix (List.take_prefix i x) hx)
+  simp only [List.length_map, List.length_range] at this
+  lia
+
+/-- Every entry of a node of the Safra tree is less than the number of states. -/
+theorem lt_of_mem_safraTree [Finite State] (ms : MacroState State) (hwf : ms.WellFormed)
+    {x : List ℕ} (hx : x ∈ ms.safraTree) {i : ℕ} (hi : i ∈ x) : i < Nat.card State := by
+  obtain ⟨y, z, rfl⟩ := List.append_of_mem hi
+  have hyi : y ++ [i] ∈ ms.safraTree :=
+    Tree.mem_of_prefix ⟨z, by simp⟩ hx
+  have hy : y ∈ ms.safraTree := Tree.mem_of_append hyi
+  have hL : ((List.range (i + 1)).map (y ++ [·])).Nodup :=
+    List.nodup_range.map fun j k hjk => by simpa using hjk
+  have := ms.length_le_of_nodup hwf hL (by
+    simp only [List.mem_map, List.mem_range]
+    rintro _ ⟨j, hj, rfl⟩
+    exact hwf.safraTree_orderd ⟨y, hy⟩ (show j ≤ i by lia) hyi)
+  simp only [List.length_map, List.length_range] at this
+  lia
 
 end MacroState
 
