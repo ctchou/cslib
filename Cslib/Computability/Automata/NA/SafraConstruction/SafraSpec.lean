@@ -35,15 +35,15 @@ namespace MacroState
 def safraTree (ms : MacroState State) : tree ℕ :=
   treeOf (range ms.host)
 
-theorem leaf_prefix_eq_self (ms : MacroState State) {x : List ℕ} {s : State} (h : s ∈ ms.states)
-    (hl : x ∈ Tree.leaves ms.safraTree) (hp : x <+: ms.host ⟨s, h⟩) :
-    ms.host ⟨s, h⟩ = x := by
+theorem leaf_prefix_eq_self (ms : MacroState State) {x : List ℕ} {s : State}
+    (hs : s ∈ ms.states) (hl : x ∈ Tree.leaves ms.safraTree) (hp : x <+: ms.host ⟨s, hs⟩) :
+    ms.host ⟨s, hs⟩ = x := by
   obtain ⟨r, hr⟩ := hp
   cases r with
   | nil => simpa using hr.symm
   | cons k r =>
     have hk : k ∈ Tree.kidsAt ms.safraTree x :=
-      ⟨_, ⟨⟨s, h⟩, rfl⟩, ⟨r, by simp [← hr]⟩⟩
+      ⟨_, ⟨⟨s, hs⟩, rfl⟩, ⟨r, by simp [← hr]⟩⟩
     have hleaf' : Tree.kidsAt ms.safraTree x = ∅ := hl.2
     simp [hleaf'] at hk
 
@@ -53,6 +53,15 @@ structure WellFormed (ms : MacroState State) : Prop where
   stableTree_sub_safraTree : ms.stableTree ≤ ms.safraTree
   host_surjOn_safraTree : SurjOn ms.host univ ms.safraTree.val
   accept_leaf : ms.accept ⊆ Tree.leaves ms.safraTree
+
+theorem safraTree_size_bound [Finite State] (ms : MacroState State) (hwf : ms.WellFormed) :
+    ms.safraTree.val.ncard ≤ Nat.card State :=
+  calc ms.safraTree.val.ncard
+    _ ≤ (ms.host '' univ).ncard :=
+      ncard_le_ncard hwf.host_surjOn_safraTree (toFinite _)
+    _ ≤ (univ : Set ms.states).ncard := ncard_image_le (toFinite _)
+    _ = Nat.card ms.states := ncard_univ _
+    _ ≤ Nat.card State := Nat.card_mono (toFinite _) (subset_univ _) |>.trans_eq Nat.card_univ
 
 end MacroState
 

@@ -100,7 +100,7 @@ theorem backward_below (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     ∃ s0, ∃ h0 : s0 ∈ ms.states, ms.host ⟨s0, h0⟩ = x ∧
       ∃ ss, na.Execution s0 as s ss ∧ ∃ t ∈ na.accept, t ∈ ss.tail := by
   induction as using List.reverseRecOn generalizing s with
-  | nil => exact absurd (MacroState.leaf_prefix_eq_self ms h (hwf.accept_leaf hacc) hx).symm hne
+  | nil => exact absurd (ms.leaf_prefix_eq_self h (hwf.accept_leaf hacc) hx).symm hne
   | append_singleton bs a ih =>
     obtain ⟨s1, h1, htr, hx1, hcase⟩ := backward_step hs hwf hst h hx (.inl hne)
     have hst' : ∀ cs, cs <+: bs → x ∈ (mda.mtr ms cs).stableTree :=
@@ -109,7 +109,7 @@ theorem backward_below (hs : SafraSpec na mda) (hwf : ms.WellFormed)
     · obtain ⟨s0, h0, hx0, ss, hex, t, ht, hts⟩ := ih hst' h1 hx1 hne1
       exact ⟨s0, h0, hx0, execution_extend_accept hex htr ⟨t, ht, .inl hts⟩⟩
     · obtain ⟨s0, h0, hx0, ss, hex⟩ := backward_stable hs hwf hst' h1 hx1
-      exact ⟨s0, h0, MacroState.leaf_prefix_eq_self ms h0 (hwf.accept_leaf hacc) hx0,
+      exact ⟨s0, h0, ms.leaf_prefix_eq_self h0 (hwf.accept_leaf hacc) hx0,
         execution_extend_accept hex htr ⟨s, hfin, .inr rfl⟩⟩
 
 /-- If `x` is accepting at `ms` and at the end of a nonempty run of `mda` from `ms` on `as`, and
@@ -130,7 +130,7 @@ theorem backward_accept (hs : SafraSpec na mda) (hwf : ms.WellFormed)
   · obtain ⟨s0, h0, hx0, ss, hex, t, ht, hts⟩ := backward_below hs hwf hst' hacc h1 hx1 hne1
     exact ⟨s0, h0, hx0, execution_extend_accept hex htr ⟨t, ht, .inl hts⟩⟩
   · obtain ⟨s0, h0, hx0, ss, hex⟩ := backward_stable hs hwf hst' h1 hx1
-    exact ⟨s0, h0, MacroState.leaf_prefix_eq_self ms h0 (hwf.accept_leaf hacc) hx0,
+    exact ⟨s0, h0, ms.leaf_prefix_eq_self h0 (hwf.accept_leaf hacc) hx0,
       execution_extend_accept hex htr ⟨s, hfin, .inr rfl⟩⟩
 
 end Cslib.SafraConstruction
